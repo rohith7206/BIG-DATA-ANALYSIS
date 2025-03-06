@@ -14,6 +14,8 @@
 
 **PLATFORM**: GOOGLE COLAB
 
+**OUTPUT**:![Image](https://github.com/user-attachments/assets/715c7b13-9a00-4035-98d8-664fa2e76cc0)
+
 Performing data analysis on a large dataset using pyspark library 
 
 🔹 INSTALLATION OF PYSPARK
