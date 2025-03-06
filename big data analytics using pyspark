@@ -1,0 +1,42 @@
+
+#big data analytics
+from pyspark.sql import SparkSession
+from pyspark.sql.types import StructType, StructField, DoubleType, StringType
+from pyspark.sql.functions import col, count, mean
+
+# Initialize Spark session
+spark = SparkSession.builder.appName("IrisDatasetAnalysis").getOrCreate()
+
+# Define correct schema
+schema = StructType([
+    StructField("sepal_length", DoubleType(), True),
+    StructField("sepal_width", DoubleType(), True),
+    StructField("petal_length", DoubleType(), True),
+    StructField("petal_width", DoubleType(), True),
+    StructField("species", StringType(), True)
+])
+
+# Load dataset with correct schema
+df = spark.read.csv("/content/iris.csv ", header=True, schema=schema)
+
+# Display schema
+df.printSchema()
+
+# Basic statistics
+df.describe().show()
+
+# Count missing values
+missing_counts = df.select([count(col(c)).alias(c) for c in df.columns])
+missing_counts.show()
+
+# Fill missing values efficiently
+numeric_cols = [c for c, t in df.dtypes if t == 'double']
+mean_values = df.select([mean(col(c)).alias(c) for c in numeric_cols]).collect()[0]
+df = df.fillna({col_name: mean_values[col_name] for col_name in numeric_cols})
+
+# Group by species and count
+grouped_df = df.groupBy("species").agg(count("*").alias("count"))
+grouped_df.show()
+
+# Stop Spark session
+spark.stop()
